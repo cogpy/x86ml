@@ -449,10 +449,14 @@ includes a deterministic profile generator:
 
 - `scripts/bochs_agi_salience_profiles.py`
 - generated outputs in `bochs/profiles/`
+- a machine-readable profile contract at `bochs/profiles/manifest.json`
 
 The generator treats `bochs/agi.bochsrc` as a base policy and applies
 high-impact replacements (CPU quantum/IPS, memory pressure, clock mode,
-logging density, and tool-channel settings) to produce three operating points:
+logging density, and tool-channel settings) to produce three operating points.
+It now also emits typed metadata for downstream orchestration: profile names,
+output files, salience vectors, normalized salience scores, replacement
+directives, and runtime control surfaces.
 
 | Profile | Objective | Salience vector |
 |---|---|---|
@@ -460,11 +464,15 @@ logging density, and tool-channel settings) to produce three operating points:
 | `agi-balanced.bochsrc` | Mixed training/inference with strong introspection | determinism=8, observability=8, throughput=7, tool_latency=8 |
 | `agi-throughput.bochsrc` | Fast broad sweeps over architecture salience | determinism=4, observability=5, throughput=10, tool_latency=9 |
 
-Generate or refresh profiles:
+Generate or refresh profiles and the manifest:
 
 ```bash
 python ./scripts/bochs_agi_salience_profiles.py
 ```
+
+The generated manifest is the stable machine-readable contract for future
+CogHood pilots and CI workflows. It allows an agent to select an operating
+point without scraping comments from the `.bochsrc` files.
 
 Launch with a specific cognitive-grip profile:
 
@@ -475,7 +483,7 @@ bochs -f ./bochs/profiles/agi-throughput.bochsrc
 ```
 
 This provides a concrete, repeatable tuning mechanism over the highest-salience
-knobs while preserving compatibility with standard x86 guest OSes.
+knobs while preserving compatibility with standard x86 guest OSes. For repository-level architecture and safe artifact handling, also see `ARCHITECTURE.md` and `docs/gift-artifacts.md`.
 
 ---
 

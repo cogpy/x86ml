@@ -1,81 +1,78 @@
-# Welcome to the Bochs IA-32 Emulator Project
+# x86ml — Bochs as a Deterministic AGI Substrate
 
-Bochs is a portable IA-32 (x86) PC emulator written in C++,
-that runs on most popular platforms. It includes emulation of the Intel x86 
-CPU, common I/O devices, and a custom BIOS.
+`x86ml` is a Bochs-derived research repository for studying the relation between **deterministic x86 emulation**, **hardware-level observability**, and **neural / LLM architecture design**. It preserves the Bochs emulator substrate while adding an AGI-oriented configuration layer, salience-tuned runtime profiles, and documentation that maps classical computer architecture to machine-learning control surfaces.
 
-Bochs can be compiled to emulate many different x86 CPUs, from early 386 to
-the most recent (sometimes even pre-market) x86-64 Intel and AMD processors.
+Bochs remains the foundation: a portable IA-32 / x86-64 PC emulator written in C++ with accurate CPU, memory, I/O-device, BIOS, debugger, and instrumentation surfaces. `x86ml` names the additional relation: Bochs as an inspectable, deterministic machine where every instruction, device event, port write, and debugger interaction can become part of a conscious event stream.
 
-Bochs is capable of running most Operating Systems inside the emulation 
-including Linux, DOS or Microsoft Windows.
+## What This Repository Adds
 
-Bochs provides many different modes of operation, in support of a wide 
-variety of use cases.  The 'typical' use of bochs is to provide complete 
-x86 PC emulation, including the x86 processor, hardware devices, and memory.
-This allows you to run OS's and software within the emulator on your workstation,
-much like you have a machine inside of a machine. For instance, let's say 
-your workstation is a Unix/X11 workstation, but you want to run Win'95 
-applications. Bochs will allow you to run Win 95 and associated software on
-your Unix/X11 workstation, displaying a window on your workstation, simulating
-a monitor on a PC.
+The current AGI layer is intentionally small, reproducible, and source-readable. It adds a focused path from emulator configuration to cognitive instrumentation without hiding the upstream emulator mechanics.
 
-## Bochs Approach
-Bochs is an emulator - not virtualization software.  It is portable across many 
-architectures: x86, ARM, MIPS, etc.  This means it must be able to emulate 
-every CPU instruction.
+| Layer | Path | Purpose |
+|---|---|---|
+| AGI base config | `bochs/agi.bochsrc` | Annotated Bochs configuration for deterministic AGI-style runs. |
+| Salience profiles | `bochs/profiles/agi-*.bochsrc` | Generated operating points for max-grip, balanced, and throughput modes. |
+| Profile manifest | `bochs/profiles/manifest.json` | Machine-readable contract for downstream agents and orchestration. |
+| Profile generator | `scripts/bochs_agi_salience_profiles.py` | Deterministically renders profile configs and metadata from the base config. |
+| Initialization helper | `scripts/bochs-agi-init.sh` | Creates runtime disk images, refreshes profiles, and verifies Bochs parsing. |
+| AGI guide | `docs/agi-bochsrc-guide.md` | Explains the hardware-to-AGI mapping and the configuration landscape. |
+| Introspection report | `INTROSPECTION_ANALYSIS.md` | Records the Super-Sleuth analysis, grip score, and improvement path. |
 
-This distinguishes Bochs from virtualization solutions like e.g. VirtualBox,
-VMWare, etc.  Those projects provide a nice user experience and fast
-performance, at the cost of hardware constraints, some non-determinism and 
-some necessary hacks to get programs working.
+## Quick Start
 
-Bochs' emulation provides a controlled, accurate execution environment, at 
-the cost of speed/performance.  This can be advantageous in some situations,
-for example:
-* When developing an operating system or bootloader
-* When dealing with very old, mission-critical software
-* When reverse-engineering system-level code
+The repository does not execute bundled binary artifacts by default. Use source-level inspection and tests first, then run Bochs only in an environment where the emulator toolchain is trusted and installed.
 
-For more information, see [the intro section](https://bochs.sourceforge.io/cgi-bin/topper.pl?name=New+Bochs+Documentation&url=https://bochs.sourceforge.io/doc/docbook/user/index.html) in the user guide.
+```bash
+python -m unittest discover -s tests -v
+python ./scripts/bochs_agi_salience_profiles.py
+```
 
-## Installing
+If `bochs` and `bximage` are installed on the host, the AGI initialization helper can prepare runtime images and verify that the base configuration parses:
 
-You can download Bochs from this GitHub page or the [project page on SourceForge](https://sourceforge.net/projects/bochs/files/bochs/3.0/).
-See the CHANGES file for details on the most recent releases.
+```bash
+./scripts/bochs-agi-init.sh
+```
 
-## Usage
-See [the documentation](https://bochs.sourceforge.io/cgi-bin/topper.pl?name=New+Bochs+Documentation&url=https://bochs.sourceforge.io/doc/docbook/).
+Launch a generated cognitive-grip profile with:
 
-## Contributing
-To get started, see [Bochs Developer Guide](https://bochs.sourceforge.io/cgi-bin/topper.pl?name=New+Bochs+Documentation&url=https://bochs.sourceforge.io/doc/docbook/).
+```bash
+bochs -f ./bochs/profiles/agi-max-grip.bochsrc
+bochs -f ./bochs/profiles/agi-balanced.bochsrc
+bochs -f ./bochs/profiles/agi-throughput.bochsrc
+```
 
-We currently need help with the below tasks.  To help with one of these tasks, please contact Volker Ruppert or Stanislav Shwartsman.
+## Cognitive-Grip Profiles
 
-### Bug Reports
-Mouse, interrupt controller, timer, IDE controller, network 
-card, keyboard, VGA... Most of our bug reports and feature requests are due
-to incomplete C++ models of the various PC devices. To improve this, we 
-need PC Hardware Gurus who know where to find the specs for this stuff and
-improve the hardware models for Bochs. Working on models is a fun way to 
-learn how things work, and unlike designing a real hard disk, you can test
-out your changes on a real operating system immediately!
+The profile generator treats `bochs/agi.bochsrc` as the base policy and applies deterministic substitutions to high-impact controls: CPU quantum / IPS, memory pressure, VGA timing, clock mode, logging density, serial agent channels, and network tool surfaces.
 
-### Disk Images 
-Our collection of disk images is getting out of date. It would be great to 
-have small or large images of a variety of free operating systems.
+| Profile | Objective | Typical Use |
+|---|---|---|
+| `max-grip` | Maximum introspection and deterministic replay fidelity | Debugging, trace analysis, evidence-grade replay. |
+| `balanced` | Mixed training / inference with strong introspection | Default exploratory runs. |
+| `throughput` | Fast broad sweeps over architecture salience | Batch experiments and large configuration searches. |
 
-### Documentation 
-Adding installation help and other useful information into the docs.
+The generated `bochs/profiles/manifest.json` is the stable machine contract for agents. It records profile names, salience vectors, salience scores, output files, replacement directives, and control surfaces such as `com1`, `com2`, `com3`, `gdbstub:1234`, `port_e9_hack`, and `e1000`.
 
+## Documentation Map
 
-## Papers/Presentations
+| Document | Read this if you want to… |
+|---|---|
+| `ARCHITECTURE.md` | Understand the repository-level relation between Bochs, x86ml, and CogHood. |
+| `docs/agi-bochsrc-guide.md` | Configure Bochs for AGI research and understand the hardware ↔ AI mapping. |
+| `docs/overview.md` | Understand the broad Bochs / x86ochs system map inherited by this fork. |
+| `docs/technical-architecture.md` | Study the emulator internals and data-flow diagrams. |
+| `docs/architecture-evolution-and-llm-insights.md` | Follow the integer → vector → tensor → LLM conceptual narrative. |
+| `docs/formal-spec-z-plus-plus.md` | Work with the formal Z++ specification. |
+| `docs/gift-artifacts.md` | Review hashes and safe-handling notes for Dan’s Bochs gift artifacts. |
 
-* Bochs was presented at ISCA-35 in Beijing, China at "The 1st Workshop on 
-Architectural and Microarchitectural Support for Binary Translation" by a 
-paper "Virtualization without direct execution - designing a portable VM".
-  * [Paper](https://bochs.sourceforge.io/Virtualization_Without_Hardware_Final.pdf)
-  * [Slides](http://bochs.sourceforge.net/VirtNoJit.pdf)
+## Relation to Bochs
 
-## Authors
-Bochs was originally written by Kevin Lawton and is currently maintained by this project.
+Bochs is a portable IA-32 / x86 PC emulator capable of emulating x86 CPUs, common I/O devices, and BIOS services. It can run operating systems such as Linux, DOS, and Microsoft Windows inside a fully emulated machine. Unlike virtualization systems such as VirtualBox or VMware, Bochs emphasizes controlled and accurate emulation over native-speed execution. That makes it valuable for operating-system development, old-software preservation, reverse engineering, deterministic replay, and hardware-model research.
+
+`x86ml` does not erase that lineage. It keeps the Bochs substrate and adds a research framing: every emulated event can be treated as an observable state transition, every device as a control surface, and every profile as a typed operating point in a larger cognitive loop.
+
+## Upstream Attribution
+
+Bochs was originally written by Kevin Lawton and is maintained by the Bochs project. The upstream Bochs documentation and downloads remain available through the [Bochs project documentation](https://bochs.sourceforge.io/cgi-bin/topper.pl?name=New+Bochs+Documentation&url=https://bochs.sourceforge.io/doc/docbook/) and [SourceForge project page](https://sourceforge.net/projects/bochs/files/bochs/3.0/).
+
+This repository preserves that foundation while developing the `x86ml` AGI instrumentation layer as part of the CogHood / AGI Neighbourhood work.

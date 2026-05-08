@@ -35,6 +35,7 @@ fi
 echo "[5/5] Environment ready."
 echo "  Base config     : $BOCHS_DIR/agi.bochsrc"
 echo "  Profile configs : $BOCHS_DIR/profiles/agi-{max-grip,balanced,throughput}.bochsrc"
+echo "  Profile manifest: $BOCHS_DIR/profiles/manifest.json"
 echo "  Weights store   : $BOCHS_DIR/weights.img"
 echo "  Scratch store   : $BOCHS_DIR/scratch_base.img"
 echo "  Control socket  : localhost:4444"

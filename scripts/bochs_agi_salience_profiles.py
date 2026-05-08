@@ -1,12 +1,17 @@
 #!/usr/bin/env python3
-"""Generate deterministic AGI salience profiles from bochs/agi.bochsrc.
+"""Generate deterministic AGI salience profiles from ``bochs/agi.bochsrc``.
 
 The profile set operationalizes a "cognitive grip" tuning strategy across
 high-salience Bochs controls:
-  - temporal determinism
-  - observability / introspection density
-  - throughput
-  - asynchronous tool responsiveness
+
+* temporal determinism
+* observability / introspection density
+* throughput
+* asynchronous tool responsiveness
+
+In addition to the rendered ``.bochsrc`` files, this module writes a
+machine-readable ``manifest.json`` so downstream CogHood pilots and other
+agents can reason about the profile contract without parsing comments.
 """
 
 from __future__ import annotations
@@ -14,13 +19,26 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 import argparse
+import json
 import re
-from typing import Dict
+from typing import Dict, Iterable, List, Mapping, Tuple
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 BASE_CONFIG = REPO_ROOT / "bochs" / "agi.bochsrc"
 OUTPUT_DIR = REPO_ROOT / "bochs" / "profiles"
+MANIFEST_NAME = "manifest.json"
+MANIFEST_SCHEMA_VERSION = "1.0.0"
+
+# Normalized weighting over the profile's own salience dimensions. These are not
+# project-wide architectural-grip weights; they are the local profile-selection
+# weights used to rank an operating point for a concrete run.
+SALIENCE_WEIGHTS: Mapping[str, float] = {
+    "determinism": 1.4,
+    "observability": 1.4,
+    "throughput": 1.1,
+    "tool_latency": 1.0,
+}
 
 
 @dataclass(frozen=True)
@@ -111,20 +129,86 @@ PROFILES = (
 )
 
 
+def directive_token(pattern: str) -> str:
+    """Return the target directive token for a replacement regex.
+
+    Example: ``^clock: .*$`` becomes ``clock``. The CPU pattern includes a
+    multiline continuation matcher, so this helper deliberately uses only the
+    first directive-like token.
+    """
+
+    match = re.search(r"\^?([A-Za-z0-9_]+):", pattern)
+    return match.group(1) if match else pattern
+
+
+def profile_score(profile: Profile) -> float:
+    """Return a normalized 0..1 salience score for a profile."""
+
+    weighted = 0.0
+    total_weight = 0.0
+    for key, value in profile.salience_vector.items():
+        weight = float(SALIENCE_WEIGHTS.get(key, 1.0))
+        weighted += max(0, min(10, int(value))) * weight
+        total_weight += 10.0 * weight
+    if total_weight == 0.0:
+        return 0.0
+    return round(weighted / total_weight, 4)
+
+
+def replacement_directives(profile: Profile) -> List[str]:
+    """List the Bochs directives modified by a profile."""
+
+    return [directive_token(pattern) for pattern in profile.replacements]
+
+
+def profile_manifest_entry(profile: Profile) -> Dict[str, object]:
+    """Build the manifest entry for one rendered profile."""
+
+    return {
+        "name": profile.name,
+        "file": f"agi-{profile.name}.bochsrc",
+        "summary": profile.summary,
+        "salience_vector": dict(profile.salience_vector),
+        "salience_score": profile_score(profile),
+        "replacement_directives": replacement_directives(profile),
+        "control_surfaces": {
+            "supervisor_channel": "com1",
+            "telemetry_channel": "com2",
+            "agent_log_channel": "com3",
+            "parallel_bulk_output": "parport1",
+            "debug_stub": "gdbstub:1234",
+            "zero_overhead_observation": "port_e9_hack",
+            "network_tool_surface": "e1000",
+        },
+    }
+
+
+def build_manifest(base_config: Path, output_dir: Path, profiles: Iterable[Profile] = PROFILES) -> Dict[str, object]:
+    """Build a typed manifest for generated salience profiles."""
+
+    profile_entries = [profile_manifest_entry(profile) for profile in profiles]
+    return {
+        "schema_version": MANIFEST_SCHEMA_VERSION,
+        "project": "x86ml",
+        "base_config": str(base_config.relative_to(REPO_ROOT)),
+        "profile_directory": str(output_dir.relative_to(REPO_ROOT)) if output_dir.is_relative_to(REPO_ROOT) else str(output_dir),
+        "generator": "scripts/bochs_agi_salience_profiles.py",
+        "salience_weights": dict(SALIENCE_WEIGHTS),
+        "profile_count": len(profile_entries),
+        "profiles": profile_entries,
+    }
+
+
 def apply_profile(base_text: str, profile: Profile) -> str:
     rendered = base_text
     for pattern, replacement in profile.replacements.items():
         rendered, count = re.subn(pattern, replacement, rendered, count=1, flags=re.MULTILINE)
         if count != 1:
             detail = "zero matches" if count == 0 else f"{count} matches"
-            # Derive a lightweight directive prefix (e.g. "cpu:", "clock:")
-            # from the regex pattern so we can print nearby matching lines.
-            token = pattern.lstrip("^").split(" ")[0].replace(".*", "").replace("(?:\\n[", "")
-            candidate_lines = []
-            if token:
-                candidate_lines = [
-                    line for line in rendered.splitlines() if line.startswith(token)
-                ][:3]
+            token = directive_token(pattern)
+            candidate_lines = [
+                line for line in rendered.splitlines() if line.startswith(f"{token}:")
+            ][:3]
             context = " | ".join(candidate_lines) if candidate_lines else "no similar directive lines found"
             raise ValueError(
                 "Failed to apply replacement for profile "
@@ -137,25 +221,42 @@ def apply_profile(base_text: str, profile: Profile) -> str:
         f"# GENERATED PROFILE: {profile.name}\n"
         f"# SUMMARY: {profile.summary}\n"
         f"# SALIENCE_VECTOR: {vector}\n"
+        f"# SALIENCE_SCORE: {profile_score(profile):.4f}\n"
         "# SOURCE: bochs/agi.bochsrc\n"
+        "# MANIFEST: bochs/profiles/manifest.json\n"
         "# Generated by scripts/bochs_agi_salience_profiles.py\n\n"
     )
     return header + rendered
 
 
-def write_profiles(base_config: Path, output_dir: Path) -> None:
+def write_manifest(base_config: Path, output_dir: Path) -> Path:
+    """Write ``manifest.json`` beside the generated profiles and return its path."""
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+    manifest_path = output_dir / MANIFEST_NAME
+    manifest = build_manifest(base_config, output_dir)
+    manifest_path.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    return manifest_path
+
+
+def write_profiles(base_config: Path, output_dir: Path) -> Tuple[List[Path], Path]:
     base_text = base_config.read_text(encoding="utf-8")
     output_dir.mkdir(parents=True, exist_ok=True)
 
+    written: List[Path] = []
     for profile in PROFILES:
         output_text = apply_profile(base_text, profile)
         out_file = output_dir / f"agi-{profile.name}.bochsrc"
         out_file.write_text(output_text, encoding="utf-8")
+        written.append(out_file)
+
+    manifest_path = write_manifest(base_config, output_dir)
+    return written, manifest_path
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Generate AGI salience profile bochsrc files."
+        description="Generate AGI salience profile bochsrc files and a typed manifest."
     )
     parser.add_argument(
         "--base-config",
@@ -174,7 +275,8 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
-    write_profiles(args.base_config, args.output_dir)
+    written, manifest_path = write_profiles(args.base_config, args.output_dir)
+    print(f"Wrote {len(written)} profiles and manifest: {manifest_path}")
     return 0
 
 

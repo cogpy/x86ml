@@ -1,0 +1,112 @@
+{
+  "base_config": "bochs/agi.bochsrc",
+  "generator": "scripts/bochs_agi_salience_profiles.py",
+  "profile_count": 3,
+  "profile_directory": "bochs/profiles",
+  "profiles": [
+    {
+      "control_surfaces": {
+        "agent_log_channel": "com3",
+        "debug_stub": "gdbstub:1234",
+        "network_tool_surface": "e1000",
+        "parallel_bulk_output": "parport1",
+        "supervisor_channel": "com1",
+        "telemetry_channel": "com2",
+        "zero_overhead_observation": "port_e9_hack"
+      },
+      "file": "agi-max-grip.bochsrc",
+      "name": "max-grip",
+      "replacement_directives": [
+        "cpu",
+        "memory",
+        "vga",
+        "clock",
+        "info",
+        "debug",
+        "log",
+        "com3",
+        "e1000"
+      ],
+      "salience_score": 0.7816,
+      "salience_vector": {
+        "determinism": 10,
+        "observability": 10,
+        "throughput": 3,
+        "tool_latency": 7
+      },
+      "summary": "Maximum architecture-awareness salience and deterministic replay fidelity."
+    },
+    {
+      "control_surfaces": {
+        "agent_log_channel": "com3",
+        "debug_stub": "gdbstub:1234",
+        "network_tool_surface": "e1000",
+        "parallel_bulk_output": "parport1",
+        "supervisor_channel": "com1",
+        "telemetry_channel": "com2",
+        "zero_overhead_observation": "port_e9_hack"
+      },
+      "file": "agi-balanced.bochsrc",
+      "name": "balanced",
+      "replacement_directives": [
+        "cpu",
+        "memory",
+        "vga",
+        "clock",
+        "info",
+        "debug",
+        "log",
+        "com3",
+        "e1000"
+      ],
+      "salience_score": 0.7776,
+      "salience_vector": {
+        "determinism": 8,
+        "observability": 8,
+        "throughput": 7,
+        "tool_latency": 8
+      },
+      "summary": "Balanced profile for mixed inference/training with strong introspection."
+    },
+    {
+      "control_surfaces": {
+        "agent_log_channel": "com3",
+        "debug_stub": "gdbstub:1234",
+        "network_tool_surface": "e1000",
+        "parallel_bulk_output": "parport1",
+        "supervisor_channel": "com1",
+        "telemetry_channel": "com2",
+        "zero_overhead_observation": "port_e9_hack"
+      },
+      "file": "agi-throughput.bochsrc",
+      "name": "throughput",
+      "replacement_directives": [
+        "cpu",
+        "memory",
+        "vga",
+        "clock",
+        "info",
+        "debug",
+        "log",
+        "com3",
+        "e1000"
+      ],
+      "salience_score": 0.6653,
+      "salience_vector": {
+        "determinism": 4,
+        "observability": 5,
+        "throughput": 10,
+        "tool_latency": 9
+      },
+      "summary": "High-throughput profile for large salience sweeps and broad search."
+    }
+  ],
+  "project": "x86ml",
+  "salience_weights": {
+    "determinism": 1.4,
+    "observability": 1.4,
+    "throughput": 1.1,
+    "tool_latency": 1.0
+  },
+  "schema_version": "1.0.0"
+}

@@ -117,9 +117,17 @@ def apply_profile(base_text: str, profile: Profile) -> str:
         rendered, count = re.subn(pattern, replacement, rendered, count=1, flags=re.MULTILINE)
         if count != 1:
             detail = "zero matches" if count == 0 else f"{count} matches"
+            token = pattern.lstrip("^").split(" ")[0].replace(".*", "").replace("(?:\\n[", "")
+            candidate_lines = []
+            if token:
+                candidate_lines = [
+                    line for line in rendered.splitlines() if line.startswith(token)
+                ][:3]
+            context = " | ".join(candidate_lines) if candidate_lines else "no similar directive lines found"
             raise ValueError(
                 "Failed to apply replacement for profile "
-                f"'{profile.name}': {detail}; pattern={pattern!r}; replacement={replacement!r}"
+                f"'{profile.name}': {detail}; pattern={pattern!r}; replacement={replacement!r}; "
+                f"context={context}"
             )
 
     vector = ", ".join(f"{k}={v}" for k, v in profile.salience_vector.items())

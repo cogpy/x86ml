@@ -17,8 +17,9 @@ class SalienceProfileGenerationTests(unittest.TestCase):
         self.base_text = self.base_path.read_text(encoding="utf-8")
 
     def test_apply_profile_writes_salience_header(self) -> None:
-        rendered = apply_profile(self.base_text, PROFILES[0])
-        expected_vector = ", ".join(f"{k}={v}" for k, v in PROFILES[0].salience_vector.items())
+        max_grip = next(p for p in PROFILES if p.name == "max-grip")
+        rendered = apply_profile(self.base_text, max_grip)
+        expected_vector = ", ".join(f"{k}={v}" for k, v in max_grip.salience_vector.items())
         self.assertIn("# GENERATED PROFILE: max-grip", rendered)
         self.assertIn(f"SALIENCE_VECTOR: {expected_vector}", rendered)
         self.assertIn("clock: sync=slowdown, time0=0, rtc_sync=0", rendered)

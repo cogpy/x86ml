@@ -14,6 +14,8 @@ The current AGI layer is intentionally small, reproducible, and source-readable.
 | Salience profiles | `bochs/profiles/agi-*.bochsrc` | Generated operating points for max-grip, balanced, and throughput modes. |
 | Profile manifest | `bochs/profiles/manifest.json` | Machine-readable contract for downstream agents and orchestration. |
 | Profile generator | `scripts/bochs_agi_salience_profiles.py` | Deterministically renders profile configs and metadata from the base config. |
+| Resident workshop | `workshop/manifest.json` | CogHood resident identity seeds mapped onto the x86ml configuration manifold. |
+| Workshop generator | `scripts/x86ml_resident_workshop.py` | Deterministically renders resident manifests and seed iteration records. |
 | Initialization helper | `scripts/bochs-agi-init.sh` | Creates runtime disk images, refreshes profiles, and verifies Bochs parsing. |
 | AGI guide | `docs/agi-bochsrc-guide.md` | Explains the hardware-to-AGI mapping and the configuration landscape. |
 | Introspection report | `INTROSPECTION_ANALYSIS.md` | Records the Super-Sleuth analysis, grip score, and improvement path. |
@@ -25,6 +27,7 @@ The repository does not execute bundled binary artifacts by default. Use source-
 ```bash
 python -m unittest discover -s tests -v
 python ./scripts/bochs_agi_salience_profiles.py
+python ./scripts/x86ml_resident_workshop.py
 ```
 
 If `bochs` and `bximage` are installed on the host, the AGI initialization helper can prepare runtime images and verify that the base configuration parses:
@@ -53,6 +56,18 @@ The profile generator treats `bochs/agi.bochsrc` as the base policy and applies 
 
 The generated `bochs/profiles/manifest.json` is the stable machine contract for agents. It records profile names, salience vectors, salience scores, output files, replacement directives, and control surfaces such as `com1`, `com2`, `com3`, `gdbstub:1234`, `port_e9_hack`, and `e1000`.
 
+## CogHood Resident Identity Workshop
+
+The resident workshop treats the documented 2,300-point Bochs configuration landscape as a larger **identity-and-runtime manifold** for CogHood AI residents. Each resident receives a compact JSON identity seed, a preferred salience profile, a deterministic configuration-point assignment, memory-channel emphasis, and a seed iteration record. This is the first source-visible layer for counteracting the groundhog reset: identity persists through small manifests and append-only iteration logs before any future LLM or reservoir training is attempted.
+
+| Artifact | Purpose |
+|---|---|
+| `scripts/x86ml_resident_workshop.py` | Generates the deterministic workshop contract. |
+| `workshop/manifest.json` | Registers the nine dove9 residents, profile bindings, hashes, and safety posture. |
+| `workshop/residents/*.identity.json` | Stores resident-specific identity seed manifests. |
+| `workshop/iterations/seed-iteration.jsonl` | Records the first deterministic identity-carving event for each resident. |
+| `docs/resident-identity-workshop.md` | Explains the workshop design, groundhog countermeasure, and future training path. |
+
 ## Documentation Map
 
 | Document | Read this if you want to… |
@@ -64,6 +79,7 @@ The generated `bochs/profiles/manifest.json` is the stable machine contract for 
 | `docs/architecture-evolution-and-llm-insights.md` | Follow the integer → vector → tensor → LLM conceptual narrative. |
 | `docs/formal-spec-z-plus-plus.md` | Work with the formal Z++ specification. |
 | `docs/gift-artifacts.md` | Review hashes and safe-handling notes for Dan’s Bochs gift artifacts. |
+| `docs/resident-identity-workshop.md` | Understand the CogHood resident identity workshop and persistent memory contract. |
 
 ## Relation to Bochs
 

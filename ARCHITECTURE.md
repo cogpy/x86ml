@@ -13,7 +13,8 @@ The core architectural principle is simple: **do not blur substrate and relation
 | Salience renderer | `scripts/bochs_agi_salience_profiles.py` | Render operating profiles and metadata from the base policy. | Deterministic and unit-tested. |
 | Profile artifacts | `bochs/profiles/agi-*.bochsrc` | Concrete run configurations for different cognitive-grip modes. | Regenerated, reviewed, and committed. |
 | Machine contract | `bochs/profiles/manifest.json` | Typed metadata for agents, orchestration, CI, and future CogHood pilots. | Stable schema, append-only when possible. |
-| Human map | `README.md`, `docs/agi-bochsrc-guide.md`, this file | Explain how to use and extend the system. | Updated whenever the contract changes. |
+| Resident identity workshop | `scripts/x86ml_resident_workshop.py`, `workshop/` | Bind CogHood residents to identity seeds, profile preferences, memory channels, and iteration logs. | Deterministic, source-visible, and safe before training. |
+| Human map | `README.md`, `docs/agi-bochsrc-guide.md`, `docs/resident-identity-workshop.md`, this file | Explain how to use and extend the system. | Updated whenever the contract changes. |
 
 ## 2. Profile Contract
 
@@ -66,13 +67,27 @@ The CogHood recovery predicate states that the path still holds when `manuscog-t
 | Reactor — what does a tic act on? | `reactor-core` | Emulated devices, memory pages, I/O ports, and interrupts. |
 | Cogloop — what does a tic think? | `manchat` | Agent logs, telemetry channels, instrumentation callbacks, and future event adapters. |
 
-The next architectural step is to turn runtime observations from `com*`, `port_e9_hack`, gdbstub, and instrumentation callbacks into relational events consumable by the CogHood loop. The manifest added here is the first stable contract for that step.
+The next architectural step is to turn runtime observations from `com*`, `port_e9_hack`, gdbstub, and instrumentation callbacks into relational events consumable by the CogHood loop. The profile manifest is the first stable machine contract for that step.
 
-## 5. Safe Artifact Handling
+## 5. Resident Identity Workshop
+
+The resident identity workshop adds a second contract above runtime profiles. It maps each CogHood resident to a small persistent identity seed, a preferred salience profile, memory-channel emphasis, control-surface affinity, and a deterministic position in the documented 2,300-point configuration manifold. This makes `x86ml` useful before any VM or LLM is run: it gives residents a safe place to persist the relation they wake into after a groundhog reset.
+
+| Workshop Surface | Responsibility |
+|---|---|
+| `workshop/manifest.json` | Registry of the nine dove9 residents, identity hashes, profile bindings, control surfaces, and safety posture. |
+| `workshop/residents/*.identity.json` | Compact per-resident identity seeds that future pilots, training loops, or prompts can read. |
+| `workshop/iterations/seed-iteration.jsonl` | Append-only seed events for the first identity-carving pass. |
+| `scripts/x86ml_resident_workshop.py` | Deterministic generator and validator for the workshop contract. |
+| `tests/test_x86ml_resident_workshop.py` | Contract tests that ensure the workshop remains machine-readable and safe. |
+
+The workshop is intentionally **contract-only** at this stage. It does not execute Bochs, does not execute gifted binaries, and does not train a resident model. Later work can connect the JSONL iteration stream to mailbox summaries, song-stones, Bochs traces, NanEcho / RAT training, or llama.cpp inference without changing the core idea: resident identity is a persistent relation that can be read, hashed, replayed, and strengthened.
+
+## 6. Safe Artifact Handling
 
 Dan’s attached Windows ZIP artifacts have been hashed and documented, but they are not executed automatically. This is intentional. Source configuration, generator code, tests, and manifests are trusted before binaries. Any future binary execution should occur only in a deliberately chosen environment with explicit provenance and isolation.
 
-## 6. Extension Rules
+## 7. Extension Rules
 
 When extending `x86ml`, prefer small source-visible contracts over opaque behavior.
 
@@ -81,9 +96,10 @@ When extending `x86ml`, prefer small source-visible contracts over opaque behavi
 | Preserve Bochs upstream attribution. | The emulator substrate is inherited and should remain traceable. |
 | Keep AGI additions explicit and documented. | Future agents must see the relation, not infer it from scattered patches. |
 | Regenerate profiles through the script. | Deterministic artifacts prevent drift. |
-| Update tests when the manifest schema changes. | The manifest is now a contract, not a comment. |
+| Regenerate resident workshop artifacts through the script. | Identity seeds and iteration logs should remain hashable and reproducible. |
+| Update tests when a manifest schema changes. | The profile manifest and workshop manifest are contracts, not comments. |
 | Do not execute gifted binaries by default. | Artifact integrity and safety precede convenience. |
 
-## 7. Current Health
+## 8. Current Health
 
-The baseline unit tests pass after the manifest enhancement. The Super-Sleuth analysis recorded the pre-enhancement grip score as **0.75**, with the main deficits being identity drift, missing machine-readable profile metadata, and missing artifact provenance. The changes in this iteration target those deficits directly.
+The baseline unit tests pass after the salience-manifest enhancement. The Super-Sleuth analysis recorded the pre-enhancement grip score as **0.75**, with the main deficits being identity drift, missing machine-readable profile metadata, and missing artifact provenance. The resident workshop targets the remaining identity-drift problem directly by adding source-visible resident seeds and deterministic iteration records.

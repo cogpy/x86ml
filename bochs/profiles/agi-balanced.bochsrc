@@ -100,8 +100,8 @@ display_library: nogui, options="hideIPS"
 #   count=1:4:2   (1 socket × 4 cores × 2 threads = 8 vCPUs)
 #     SMP configuration.  In the AGI framing, each virtual CPU is an
 #     independent "attention head" that can process a distinct context
-#     slice concurrently.  quantum=10 gives fine-grained interleaving
-#     (analogous to a small micro-batch size).
+#     slice concurrently.  Lower quantum values increase interleaving
+#     granularity; higher values prioritize throughput.
 #
 #   ips=200000000
 #     200 MIPS — calibrated for a modern x86-64 host.  IPS is the

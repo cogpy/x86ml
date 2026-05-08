@@ -117,6 +117,8 @@ def apply_profile(base_text: str, profile: Profile) -> str:
         rendered, count = re.subn(pattern, replacement, rendered, count=1, flags=re.MULTILINE)
         if count != 1:
             detail = "zero matches" if count == 0 else f"{count} matches"
+            # Derive a lightweight directive prefix (e.g. "cpu:", "clock:")
+            # from the regex pattern so we can print nearby matching lines.
             token = pattern.lstrip("^").split(" ")[0].replace(".*", "").replace("(?:\\n[", "")
             candidate_lines = []
             if token:

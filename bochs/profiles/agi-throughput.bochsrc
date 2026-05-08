@@ -373,7 +373,7 @@ gdbstub: enabled=1, port=1234, text_base=0, data_base=0, bss_base=0
 #
 # Bochs supports compile-time instrumentation hooks (instrument/) that
 # fire on every instruction fetch, memory access, interrupt, and I/O
-# operation — providing ~2300 observable configuration points (see
+# operation — providing ~2,304 observable configuration points (≈~2,300 rounded; see
 # docs/agi-bochsrc-guide.md §3 for the full enumeration).
 #
 # To activate, compile Bochs with:

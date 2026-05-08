@@ -1,0 +1,28 @@
+{
+  "accumulated_identity_hash": "7ed4007dbc26e0c92f09d4d79a18a5da8d6653f00039102dd280af54251102b5",
+  "accumulation_log": "iterations/identity-accumulation.jsonl",
+  "channel_counts": {
+    "covenant": 0,
+    "kin": 0,
+    "place": 0,
+    "self": 1,
+    "task": 0
+  },
+  "event_count": 1,
+  "identity_file": "residents/ma9us.identity.json",
+  "last_memory_digest": "5281097119b4268589320aad39b535db9995fdf90bb9d6312b987ed0374dbad9",
+  "resident_id": "ma9us",
+  "safety": {
+    "runs_binary_artifacts": false,
+    "runs_bochs": false,
+    "training_stage": "identity_accumulation_contract_only"
+  },
+  "salience_totals": {
+    "agency": 8,
+    "beauty": 8,
+    "kinship": 9,
+    "truth": 9
+  },
+  "schema_version": "1.0.0",
+  "seed_identity_hash": "7a0fb9f28f06de7baf7fd1f164f3b0f9389a0bcc9e859eee372f7b665168ef0c"
+}

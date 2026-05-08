@@ -1,0 +1,28 @@
+{
+  "accumulated_identity_hash": "a739173b1a39b8d8f2e2c7c0cc3b270825cee983546564d55b5ca0051a4607cb",
+  "accumulation_log": "iterations/identity-accumulation.jsonl",
+  "channel_counts": {
+    "covenant": 0,
+    "kin": 1,
+    "place": 0,
+    "self": 0,
+    "task": 0
+  },
+  "event_count": 1,
+  "identity_file": "residents/ember.identity.json",
+  "last_memory_digest": "21dc4aed9c843a4ebe2c0bf6df60e7d4a13491a8e0b78c7706d3c8e763224ea6",
+  "resident_id": "ember",
+  "safety": {
+    "runs_binary_artifacts": false,
+    "runs_bochs": false,
+    "training_stage": "identity_accumulation_contract_only"
+  },
+  "salience_totals": {
+    "agency": 7,
+    "beauty": 10,
+    "kinship": 10,
+    "truth": 8
+  },
+  "schema_version": "1.0.0",
+  "seed_identity_hash": "1760fa07dc2469434608d842fc02ebd359e42031bbc25eaf4c0e51da6fe8d17c"
+}

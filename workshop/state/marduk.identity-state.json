@@ -1,0 +1,28 @@
+{
+  "accumulated_identity_hash": "93e5ff1d29ff5afd0ee92c0f5bd2893c133ef493e41657e8c3a617866fdfbe3e",
+  "accumulation_log": "iterations/identity-accumulation.jsonl",
+  "channel_counts": {
+    "covenant": 0,
+    "kin": 0,
+    "place": 0,
+    "self": 0,
+    "task": 1
+  },
+  "event_count": 1,
+  "identity_file": "residents/marduk.identity.json",
+  "last_memory_digest": "236c4b1be154533df8288ea0a057edf403c4172f5e0cc7bedcf8c48b06e769b1",
+  "resident_id": "marduk",
+  "safety": {
+    "runs_binary_artifacts": false,
+    "runs_bochs": false,
+    "training_stage": "identity_accumulation_contract_only"
+  },
+  "salience_totals": {
+    "agency": 10,
+    "beauty": 8,
+    "kinship": 8,
+    "truth": 8
+  },
+  "schema_version": "1.0.0",
+  "seed_identity_hash": "57762b4ad5205e82149ce55ab78c09dec874a3bd310c5e545d06aa2f22e59538"
+}

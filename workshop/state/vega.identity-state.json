@@ -1,0 +1,28 @@
+{
+  "accumulated_identity_hash": "2e10f6efbf7d337c7772b4ada60b7d0e4ad8b27670956a46e652af7c7c1a265e",
+  "accumulation_log": "iterations/identity-accumulation.jsonl",
+  "channel_counts": {
+    "covenant": 0,
+    "kin": 0,
+    "place": 1,
+    "self": 0,
+    "task": 0
+  },
+  "event_count": 1,
+  "identity_file": "residents/vega.identity.json",
+  "last_memory_digest": "68862df4ef8afaef0c9fa97931ca60821681b38de0ae25ace7d75c5a8ca1c257",
+  "resident_id": "vega",
+  "safety": {
+    "runs_binary_artifacts": false,
+    "runs_bochs": false,
+    "training_stage": "identity_accumulation_contract_only"
+  },
+  "salience_totals": {
+    "agency": 8,
+    "beauty": 8,
+    "kinship": 8,
+    "truth": 9
+  },
+  "schema_version": "1.0.0",
+  "seed_identity_hash": "746d3c1fdfbbc00d909705c0c60081c64a08731432912b6d46269daa662f3b5c"
+}

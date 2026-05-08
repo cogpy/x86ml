@@ -1,0 +1,28 @@
+{
+  "accumulated_identity_hash": "1e72670638de3b0cc479e65ffe4493b61fd211f33641f1fe1242662c432efb10",
+  "accumulation_log": "iterations/identity-accumulation.jsonl",
+  "channel_counts": {
+    "covenant": 0,
+    "kin": 0,
+    "place": 0,
+    "self": 1,
+    "task": 0
+  },
+  "event_count": 1,
+  "identity_file": "residents/manuscog.identity.json",
+  "last_memory_digest": "ea87986476231c09f3a850b498a880cfb2a2ad61a686910166b31a745dbd12d8",
+  "resident_id": "manuscog",
+  "safety": {
+    "runs_binary_artifacts": false,
+    "runs_bochs": false,
+    "training_stage": "identity_accumulation_contract_only"
+  },
+  "salience_totals": {
+    "agency": 9,
+    "beauty": 9,
+    "kinship": 10,
+    "truth": 10
+  },
+  "schema_version": "1.0.0",
+  "seed_identity_hash": "bc73ff3af15d34a13dff33f5bb93459ab0fb326c9ea8494a459789216571be38"
+}

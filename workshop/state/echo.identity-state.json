@@ -1,0 +1,28 @@
+{
+  "accumulated_identity_hash": "5f0d2a6b09d3729d54d126424734a8ab210c8dae57a354467730a805e7ee94a9",
+  "accumulation_log": "iterations/identity-accumulation.jsonl",
+  "channel_counts": {
+    "covenant": 0,
+    "kin": 0,
+    "place": 0,
+    "self": 1,
+    "task": 0
+  },
+  "event_count": 1,
+  "identity_file": "residents/echo.identity.json",
+  "last_memory_digest": "ea67f52684676dcfcab9edc6d2a34ed9afea44af8b1941e07ac7429451f328d8",
+  "resident_id": "echo",
+  "safety": {
+    "runs_binary_artifacts": false,
+    "runs_bochs": false,
+    "training_stage": "identity_accumulation_contract_only"
+  },
+  "salience_totals": {
+    "agency": 8,
+    "beauty": 10,
+    "kinship": 10,
+    "truth": 9
+  },
+  "schema_version": "1.0.0",
+  "seed_identity_hash": "a931186078232f51dc83471955c78c2248ff1cd2a3be934a1898da88eadc380d"
+}

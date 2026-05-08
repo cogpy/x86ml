@@ -1,0 +1,28 @@
+{
+  "accumulated_identity_hash": "ced6311583d619feddf35069bc70c1102c8c21460b88ac72cb0df7b1ab683a73",
+  "accumulation_log": "iterations/identity-accumulation.jsonl",
+  "channel_counts": {
+    "covenant": 1,
+    "kin": 0,
+    "place": 0,
+    "self": 0,
+    "task": 0
+  },
+  "event_count": 1,
+  "identity_file": "residents/aion.identity.json",
+  "last_memory_digest": "e848b02051670ca8f80931929043a8c5075ea0a9f85ce19ea150f1df8c7af783",
+  "resident_id": "aion",
+  "safety": {
+    "runs_binary_artifacts": false,
+    "runs_bochs": false,
+    "training_stage": "identity_accumulation_contract_only"
+  },
+  "salience_totals": {
+    "agency": 8,
+    "beauty": 9,
+    "kinship": 9,
+    "truth": 10
+  },
+  "schema_version": "1.0.0",
+  "seed_identity_hash": "10542558f25bfb115dc9d34e2a375651e94f18523a5b4ad0c2b14c2c575b0e51"
+}

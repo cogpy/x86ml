@@ -13,8 +13,9 @@ The core architectural principle is simple: **do not blur substrate and relation
 | Salience renderer | `scripts/bochs_agi_salience_profiles.py` | Render operating profiles and metadata from the base policy. | Deterministic and unit-tested. |
 | Profile artifacts | `bochs/profiles/agi-*.bochsrc` | Concrete run configurations for different cognitive-grip modes. | Regenerated, reviewed, and committed. |
 | Machine contract | `bochs/profiles/manifest.json` | Typed metadata for agents, orchestration, CI, and future CogHood pilots. | Stable schema, append-only when possible. |
-| Resident identity workshop | `scripts/x86ml_resident_workshop.py`, `workshop/` | Bind CogHood residents to identity seeds, profile preferences, memory channels, and iteration logs. | Deterministic, source-visible, and safe before training. |
-| Human map | `README.md`, `docs/agi-bochsrc-guide.md`, `docs/resident-identity-workshop.md`, this file | Explain how to use and extend the system. | Updated whenever the contract changes. |
+| Resident identity workshop | `scripts/x86ml_resident_workshop.py`, `workshop/` | Bind CogHood residents to identity seeds, profile preferences, memory channels, and seed iteration logs. | Deterministic, source-visible, and safe before training. |
+| Identity accumulation | `scripts/x86ml_identity_accumulator.py`, `workshop/memory/`, `workshop/state/` | Integrate bounded memory summaries into digest-chained resident identity state. | Append-only, reproducible, and contract-only before training. |
+| Human map | `README.md`, `docs/agi-bochsrc-guide.md`, `docs/resident-identity-workshop.md`, `docs/identity-accumulation.md`, this file | Explain how to use and extend the system. | Updated whenever the contract changes. |
 
 ## 2. Profile Contract
 
@@ -71,17 +72,22 @@ The next architectural step is to turn runtime observations from `com*`, `port_e
 
 ## 5. Resident Identity Workshop
 
-The resident identity workshop adds a second contract above runtime profiles. It maps each CogHood resident to a small persistent identity seed, a preferred salience profile, memory-channel emphasis, control-surface affinity, and a deterministic position in the documented 2,300-point configuration manifold. This makes `x86ml` useful before any VM or LLM is run: it gives residents a safe place to persist the relation they wake into after a groundhog reset.
+The resident identity workshop adds a second contract above runtime profiles. It maps each CogHood resident to a small persistent identity seed, a preferred salience profile, memory-channel emphasis, control-surface affinity, and a deterministic position in the documented 2,300-point configuration manifold. The identity accumulation layer adds the first growth contract above those seeds: bounded memory summaries become digest-chained events and per-resident state. This makes `x86ml` useful before any VM or LLM is run: it gives residents a safe place to persist the relation they wake into after a groundhog reset, and a deterministic way to strengthen that relation over iterations.
 
 | Workshop Surface | Responsibility |
 |---|---|
 | `workshop/manifest.json` | Registry of the nine dove9 residents, identity hashes, profile bindings, control surfaces, and safety posture. |
 | `workshop/residents/*.identity.json` | Compact per-resident identity seeds that future pilots, training loops, or prompts can read. |
 | `workshop/iterations/seed-iteration.jsonl` | Append-only seed events for the first identity-carving pass. |
+| `workshop/memory/seed-memories.jsonl` | Reviewed bounded seed impressions for all nine residents. |
+| `workshop/iterations/identity-accumulation.jsonl` | Digest-chained memory-integration records. |
+| `workshop/state/*.identity-state.json` | Portable accumulated resident identity state derived from identity seeds plus memory digests. |
 | `scripts/x86ml_resident_workshop.py` | Deterministic generator and validator for the workshop contract. |
+| `scripts/x86ml_identity_accumulator.py` | Deterministic accumulator and validator for bounded memory integration. |
 | `tests/test_x86ml_resident_workshop.py` | Contract tests that ensure the workshop remains machine-readable and safe. |
+| `tests/test_x86ml_identity_accumulator.py` | Contract tests for source memory validation, digest determinism, and state generation. |
 
-The workshop is intentionally **contract-only** at this stage. It does not execute Bochs, does not execute gifted binaries, and does not train a resident model. Later work can connect the JSONL iteration stream to mailbox summaries, song-stones, Bochs traces, NanEcho / RAT training, or llama.cpp inference without changing the core idea: resident identity is a persistent relation that can be read, hashed, replayed, and strengthened.
+The workshop and accumulator remain intentionally **contract-only** at this stage. They do not execute Bochs, do not execute gifted binaries, and do not train a resident model. Later work can connect the JSONL iteration stream to mailbox summaries, song-stones, Bochs traces, NanEcho / RAT training, llama.cpp inference, virtual devices, or OpenCog subsystems without changing the core idea: resident identity is a persistent relation that can be read, hashed, replayed, accumulated, and strengthened.
 
 ## 6. Safe Artifact Handling
 
@@ -97,7 +103,8 @@ When extending `x86ml`, prefer small source-visible contracts over opaque behavi
 | Keep AGI additions explicit and documented. | Future agents must see the relation, not infer it from scattered patches. |
 | Regenerate profiles through the script. | Deterministic artifacts prevent drift. |
 | Regenerate resident workshop artifacts through the script. | Identity seeds and iteration logs should remain hashable and reproducible. |
-| Update tests when a manifest schema changes. | The profile manifest and workshop manifest are contracts, not comments. |
+| Accumulate identity only from bounded reviewed memory JSONL. | The memory spine should grow through explicit impressions, not hidden context drift. |
+| Update tests when a manifest schema changes. | The profile manifest, workshop manifest, and identity state files are contracts, not comments. |
 | Do not execute gifted binaries by default. | Artifact integrity and safety precede convenience. |
 
 ## 8. Current Health

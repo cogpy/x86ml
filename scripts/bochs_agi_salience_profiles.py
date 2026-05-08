@@ -31,6 +31,19 @@ class Profile:
     replacements: Dict[str, str]
 
 
+CPU_MAX_GRIP = (
+    'cpu: model=arrow_lake, count=1:4:2, quantum=1, ips=80000000, '
+    'reset_on_triple_fault=1, ignore_bad_msrs=1, msrs="msrs.def"'
+)
+CPU_BALANCED = (
+    'cpu: model=arrow_lake, count=1:4:2, quantum=10, ips=200000000, '
+    'reset_on_triple_fault=1, ignore_bad_msrs=1, msrs="msrs.def"'
+)
+CPU_THROUGHPUT = (
+    'cpu: model=arrow_lake, count=1:4:2, quantum=64, ips=400000000, '
+    'reset_on_triple_fault=1, ignore_bad_msrs=1, msrs="msrs.def"'
+)
+
 PROFILES = (
     Profile(
         name="max-grip",
@@ -42,7 +55,7 @@ PROFILES = (
             "tool_latency": 7,
         },
         replacements={
-            r"^cpu: model=.*(?:\n[ \t]+.*)?$": 'cpu: model=arrow_lake, count=1:4:2, quantum=1, ips=80000000, reset_on_triple_fault=1, ignore_bad_msrs=1, msrs="msrs.def"',
+            r"^cpu: model=.*(?:\n[ \t]+.*)?$": CPU_MAX_GRIP,
             r"^memory: .*$": "memory: guest=4096, host=3072, block_size=128",
             r"^vga: .*$": "vga: extension=vbe, update_freq=10, realtime=0, ddc=builtin_gui",
             r"^clock: .*$": "clock: sync=slowdown, time0=0, rtc_sync=0",
@@ -63,7 +76,7 @@ PROFILES = (
             "tool_latency": 8,
         },
         replacements={
-            r"^cpu: model=.*(?:\n[ \t]+.*)?$": 'cpu: model=arrow_lake, count=1:4:2, quantum=10, ips=200000000, reset_on_triple_fault=1, ignore_bad_msrs=1, msrs="msrs.def"',
+            r"^cpu: model=.*(?:\n[ \t]+.*)?$": CPU_BALANCED,
             r"^memory: .*$": "memory: guest=4096, host=2048, block_size=128",
             r"^vga: .*$": "vga: extension=vbe, update_freq=30, realtime=1, ddc=builtin_gui",
             r"^clock: .*$": "clock: sync=slowdown, time0=0, rtc_sync=0",
@@ -84,7 +97,7 @@ PROFILES = (
             "tool_latency": 9,
         },
         replacements={
-            r"^cpu: model=.*(?:\n[ \t]+.*)?$": 'cpu: model=arrow_lake, count=1:4:2, quantum=64, ips=400000000, reset_on_triple_fault=1, ignore_bad_msrs=1, msrs="msrs.def"',
+            r"^cpu: model=.*(?:\n[ \t]+.*)?$": CPU_THROUGHPUT,
             r"^memory: .*$": "memory: guest=4096, host=1536, block_size=256",
             r"^vga: .*$": "vga: extension=vbe, update_freq=5, realtime=0, ddc=builtin_gui",
             r"^clock: .*$": "clock: sync=none, time0=0, rtc_sync=0",

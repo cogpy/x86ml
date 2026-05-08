@@ -34,7 +34,7 @@ The document you are reading now provides:
 
 - The **rationale** for each parameter choice.
 - The **complete mapping** between Bochs concepts and neural-architecture concepts.
-- An **enumeration** of the ~2,304 Bochs configuration points (≈~2,300 rounded) and how they compare
+- An **enumeration** of the ~2,304 Bochs configuration points and how they compare
   to the ~80 knobs available in ggml / llama.cpp.
 - An **initialization script** (`scripts/bochs-agi-init.sh`) that sets up the
   disk images and generates salience-tuned profile sets for the AGI loop.

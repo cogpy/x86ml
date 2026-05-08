@@ -18,8 +18,9 @@ class SalienceProfileGenerationTests(unittest.TestCase):
 
     def test_apply_profile_writes_salience_header(self) -> None:
         rendered = apply_profile(self.base_text, PROFILES[0])
+        expected_vector = ", ".join(f"{k}={v}" for k, v in PROFILES[0].salience_vector.items())
         self.assertIn("# GENERATED PROFILE: max-grip", rendered)
-        self.assertIn("SALIENCE_VECTOR: determinism=10, observability=10, throughput=3, tool_latency=7", rendered)
+        self.assertIn(f"SALIENCE_VECTOR: {expected_vector}", rendered)
         self.assertIn("clock: sync=slowdown, time0=0, rtc_sync=0", rendered)
 
     def test_write_profiles_creates_all_profiles(self) -> None:

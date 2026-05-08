@@ -124,7 +124,6 @@ display_library: nogui, options="hideIPS"
 #     the guest environment without modifying the BIOS or kernel.
 ########################################################################
 cpu: model=arrow_lake, count=1:4:2, quantum=10, ips=200000000, reset_on_triple_fault=1, ignore_bad_msrs=1, msrs="msrs.def"
-     reset_on_triple_fault=1, ignore_bad_msrs=1, msrs="msrs.def"
 cpu: cpuid_limit_winnt=0
 
 

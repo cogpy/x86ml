@@ -3,12 +3,17 @@ import shutil
 import tempfile
 import unittest
 
-from scripts.bochs_agi_salience_profiles import PROFILES, apply_profile, write_profiles
+from scripts.bochs_agi_salience_profiles import (
+    PROFILES,
+    REPO_ROOT,
+    apply_profile,
+    write_profiles,
+)
 
 
 class SalienceProfileGenerationTests(unittest.TestCase):
     def setUp(self) -> None:
-        self.base_path = Path("/home/runner/work/x86ml/x86ml/bochs/agi.bochsrc")
+        self.base_path = REPO_ROOT / "bochs" / "agi.bochsrc"
         self.base_text = self.base_path.read_text(encoding="utf-8")
 
     def test_apply_profile_writes_salience_header(self) -> None:

@@ -42,7 +42,7 @@ PROFILES = (
             "tool_latency": 7,
         },
         replacements={
-            r"^cpu: model=.*$": 'cpu: model=arrow_lake, count=1:4:2, quantum=1, ips=80000000, reset_on_triple_fault=1, ignore_bad_msrs=1, msrs="msrs.def"',
+            r"^cpu: model=.*\\\n\s+reset_on_triple_fault=.*$": 'cpu: model=arrow_lake, count=1:4:2, quantum=1, ips=80000000, reset_on_triple_fault=1, ignore_bad_msrs=1, msrs="msrs.def"',
             r"^memory: .*$": "memory: guest=4096, host=3072, block_size=128",
             r"^vga: .*$": "vga: extension=vbe, update_freq=10, realtime=0, ddc=builtin_gui",
             r"^clock: .*$": "clock: sync=slowdown, time0=0, rtc_sync=0",
@@ -63,7 +63,7 @@ PROFILES = (
             "tool_latency": 8,
         },
         replacements={
-            r"^cpu: model=.*$": 'cpu: model=arrow_lake, count=1:4:2, quantum=10, ips=200000000, reset_on_triple_fault=1, ignore_bad_msrs=1, msrs="msrs.def"',
+            r"^cpu: model=.*\\\n\s+reset_on_triple_fault=.*$": 'cpu: model=arrow_lake, count=1:4:2, quantum=10, ips=200000000, reset_on_triple_fault=1, ignore_bad_msrs=1, msrs="msrs.def"',
             r"^memory: .*$": "memory: guest=4096, host=2048, block_size=128",
             r"^vga: .*$": "vga: extension=vbe, update_freq=30, realtime=1, ddc=builtin_gui",
             r"^clock: .*$": "clock: sync=slowdown, time0=0, rtc_sync=0",
@@ -84,7 +84,7 @@ PROFILES = (
             "tool_latency": 9,
         },
         replacements={
-            r"^cpu: model=.*$": 'cpu: model=arrow_lake, count=1:4:2, quantum=64, ips=400000000, reset_on_triple_fault=1, ignore_bad_msrs=1, msrs="msrs.def"',
+            r"^cpu: model=.*\\\n\s+reset_on_triple_fault=.*$": 'cpu: model=arrow_lake, count=1:4:2, quantum=64, ips=400000000, reset_on_triple_fault=1, ignore_bad_msrs=1, msrs="msrs.def"',
             r"^memory: .*$": "memory: guest=4096, host=1536, block_size=256",
             r"^vga: .*$": "vga: extension=vbe, update_freq=5, realtime=0, ddc=builtin_gui",
             r"^clock: .*$": "clock: sync=none, time0=0, rtc_sync=0",
@@ -103,8 +103,10 @@ def apply_profile(base_text: str, profile: Profile) -> str:
     for pattern, replacement in profile.replacements.items():
         rendered, count = re.subn(pattern, replacement, rendered, count=1, flags=re.MULTILINE)
         if count != 1:
+            detail = "zero matches" if count == 0 else f"{count} matches"
             raise ValueError(
-                f"Failed to apply replacement for profile '{profile.name}': pattern {pattern!r}"
+                "Failed to apply replacement for profile "
+                f"'{profile.name}': {detail}; pattern={pattern!r}; replacement={replacement!r}"
             )
 
     vector = ", ".join(f"{k}={v}" for k, v in profile.salience_vector.items())

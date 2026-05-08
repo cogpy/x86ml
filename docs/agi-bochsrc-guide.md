@@ -19,7 +19,8 @@
 8. [Debugging and Introspection](#8-debugging-and-introspection)
 9. [Determinism and Reproducibility](#9-determinism-and-reproducibility)
 10. [Initialization Script](#10-initialization-script)
-11. [Relationship to Other Documents](#11-relationship-to-other-documents)
+11. [Salience-Tuned Profile Implementation](#11-salience-tuned-profile-implementation)
+12. [Relationship to Other Documents](#12-relationship-to-other-documents)
 
 ---
 
@@ -36,7 +37,7 @@ The document you are reading now provides:
 - An **enumeration** of the ~2 300 Bochs configuration points and how they compare
   to the ~80 knobs available in ggml / llama.cpp.
 - An **initialization script** (`scripts/bochs-agi-init.sh`) that sets up the
-  disk images, network tap, and serial sockets needed to run the configuration.
+  disk images and generates salience-tuned profile sets for the AGI loop.
 
 ---
 
@@ -431,49 +432,54 @@ suitable for offline RL and imitation learning:
 
 ## 10. Initialization Script
 
-The following script creates the disk images and verifies that the
-configuration can parse cleanly before launching a full guest.
+Use the implementation script at `scripts/bochs-agi-init.sh` to create the
+disk images, generate salience profiles, and verify Bochs can parse the base
+configuration.
 
 ```bash
-#!/usr/bin/env bash
-# scripts/bochs-agi-init.sh — initialise the AGI Bochs environment
-set -euo pipefail
-
-BOCHS_DIR="$(cd "$(dirname "$0")/.." && pwd)/bochs"
-cd "$BOCHS_DIR"
-
-echo "[1/4] Creating model weight store (64 GB growing image)..."
-if [ ! -f weights.img ]; then
-    bximage -func=create -hd=64000 -imgmode=growing -sectsize=512 \
-            -q weights.img
-fi
-
-echo "[2/4] Creating activation scratchpad (8 GB growing image)..."
-if [ ! -f scratch_base.img ]; then
-    bximage -func=create -hd=8000 -imgmode=growing -sectsize=512 \
-            -q scratch_base.img
-fi
-
-echo "[3/4] Verifying configuration syntax..."
-if bochs -f agi.bochsrc -q 'quit' 2>&1 | tee /tmp/bochs-verify.log | grep -qiE "error|parse|unknown"; then
-    echo "WARNING: potential configuration issue detected. See /tmp/bochs-verify.log"
-else
-    echo "Configuration parsed cleanly."
-fi
-
-echo "[4/4] Environment ready."
-echo "  Weights store : $BOCHS_DIR/weights.img"
-echo "  Scratch store : $BOCHS_DIR/scratch_base.img"
-echo "  Control socket: localhost:4444"
-echo "  Agent bus     : localhost:4445"
-echo "  GDB stub      : localhost:1234"
-echo ""
-echo "Launch with:  bochs -f agi.bochsrc"
+./scripts/bochs-agi-init.sh
 ```
 
 ---
 
-## 11. Relationship to Other Documents
+## 11. Salience-Tuned Profile Implementation
+
+To operationalize the 2,300-point salience landscape, the repository now
+includes a deterministic profile generator:
+
+- `scripts/bochs_agi_salience_profiles.py`
+- generated outputs in `bochs/profiles/`
+
+The generator treats `bochs/agi.bochsrc` as a base policy and applies
+high-impact replacements (CPU quantum/IPS, memory pressure, clock mode,
+logging density, and tool-channel settings) to produce three operating points:
+
+| Profile | Objective | Salience vector |
+|---|---|---|
+| `agi-max-grip.bochsrc` | Maximum introspection and deterministic replay | determinism=10, observability=10, throughput=3, tool_latency=7 |
+| `agi-balanced.bochsrc` | Mixed training/inference with strong introspection | determinism=8, observability=8, throughput=7, tool_latency=8 |
+| `agi-throughput.bochsrc` | Fast broad sweeps over architecture salience | determinism=4, observability=5, throughput=10, tool_latency=9 |
+
+Generate or refresh profiles:
+
+```bash
+python ./scripts/bochs_agi_salience_profiles.py
+```
+
+Launch with a specific cognitive-grip profile:
+
+```bash
+bochs -f ./bochs/profiles/agi-max-grip.bochsrc
+bochs -f ./bochs/profiles/agi-balanced.bochsrc
+bochs -f ./bochs/profiles/agi-throughput.bochsrc
+```
+
+This provides a concrete, repeatable tuning mechanism over the highest-salience
+knobs while preserving compatibility with standard x86 guest OSes.
+
+---
+
+## 12. Relationship to Other Documents
 
 ```
 docs/
